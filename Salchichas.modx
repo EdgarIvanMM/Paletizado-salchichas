@@ -1,0 +1,32 @@
+MODULE MainModule
+	PERS tooldata chupador := [TRUE,[[0,0,11],[1,0,0,0]],[0.7,[-21.3,-14.8,51.3],[1,0,0,0],0.011,0.011,0.001]];
+	CONST robtarget acercarAgarrar := [[766.97,-292.76,416.04],[0.0139469,0.91811,0.396053,0.00467851],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget agarrar := [[767.02,-292.78,261.55],[0.0140099,0.91811,0.396051,0.00473133],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget soltar := [[871.01,192.78,235.79],[0.00327119,0.367427,0.930046,0.00109883],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget home := [[756.02,12.22,901.96],[0.0140844,0.918175,0.395895,0.00484775],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+	CONST robtarget pruebaDejr := [[871,187.66,243.62],[0.00326923,0.36727,0.930108,0.00104872],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+PROC Main()
+    MoveJ home ,v500,z50,chupador;
+    tomarSalchicha;
+ENDPROC
+
+PROC tomarSalchicha()
+    MoveJ acercarAgarrar, v500, z50, chupador;
+    MoveL agarrar, v500, z50, chupador;
+    WaitRob \ZeroSpeed;
+    !Encender chupador 
+    WaitTime 1.5;
+    dejarSalchicha;
+ENDPROC
+
+PROC dejarSalchicha()
+    MoveJ Offs(pruebaDejr, 0, 0, 100), v500, fine, chupador;          
+    MoveL pruebaDejr, v500, z50, chupador;
+    MoveL Offs(pruebaDejr, 0, 0, 100), v500, fine, chupador;
+    WaitTime 2;
+    tomarSalchicha;
+ENDPROC
+
+ENDMODULE

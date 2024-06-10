@@ -1,0 +1,249 @@
+MODULE MainModule
+	PERS tooldata chupador := [TRUE,[[0,0,11],[1,0,0,0]],[0.7,[-21.3,-14.8,51.3],[1,0,0,0],0.011,0.011,0.001]];
+	CONST robtarget acercarAgarrar := [[766.97,-292.76,416.04],[0.0139469,0.91811,0.396053,0.00467851],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget agarrar := [[794.42,-271.50,263.68],[0.00666167,0.932478,-0.360927,0.013075],[-1,-1,2,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget soltar := [[871.01,192.78,235.79],[0.00327119,0.367427,0.930046,0.00109883],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget home := [[756.02,12.22,901.96],[0.0140844,0.918175,0.395895,0.00484775],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+	CONST robtarget pruebaDejr := [[870.66,214.83,229.67],[0.00387998,0.917744,0.397065,0.00839315],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+    VAR NUM countSalchicha:=0;
+    VAR bool cuadro1 := FALSE;
+    VAR bool cuadro2 := FALSE;
+    VAR bool cuadro3 := FALSE;
+    VAR bool cuadro4 := FALSE;
+    VAR bool cuadroV1 := FALSE;
+    VAR bool cuadroV2 := FALSE;
+    VAR bool cuadroV3 := FALSE;
+    VAR bool cuadroV4 := FALSE;
+    VAR bool cuadroV5 := FALSE;
+    VAR bool cuadroV6 := FALSE;
+    VAR bool cuadroV7 := FALSE;
+    VAR bool cuadroV8 := FALSE;
+    
+    CONST robtarget preVertical1 := [[641.32,202.04,206.85],[0.259751,-0.656779,0.270201,-0.654341],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget postVertical1 := [[623.40,202.07,206.84],[0.259771,-0.656785,0.270142,-0.654351],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget agarrarVertical := [[741.72,-220.18,260.28],[0.00751431,0.912615,0.408748,0.00169762],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    CONST robtarget preCentro := [[756.38,142.48,586.04],[0.123692,-0.741672,0.239175,-0.614344],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget preVertical2 := [[740.25,11.98,226.27],[0.645544,-0.6468,-0.301648,-0.271903],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget postVertical2 := [[740.22,-8.29,226.25],[0.645525,-0.646829,-0.301603,-0.271931],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    CONST robtarget pruebaOffAgarreVertical := [[741.73,-220.18,403.92],[0.00752064,0.912625,0.408726,0.00170749],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget pruebaOffPre := [[641.31,202.02,361.19],[0.2597,-0.656782,0.27021,-0.654355],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+PROC Main()
+    IF cuadro1 = false THEN
+    MoveJ home ,v500,z50,chupador;
+    tomarSalchicha;
+    ENDIF
+ENDPROC
+
+PROC tomarSalchicha()
+    IF cuadro1 AND cuadro2 AND cuadro3 AND cuadro4 = TRUE THEN
+        TPWrite "Conteo de salchichas: "\ Num := countSalchicha;
+        MoveJ Offs(agarrarVertical, 0, 0, 250), v500, fine, chupador;
+        MoveL agarrarVertical, v500, z50, chupador;
+        WaitRob \ZeroSpeed;
+        !Encender chupador
+        STOP;
+        WaitTime 0.5;
+        MoveL Offs(agarrarVertical, 0, 0, 250), v500, fine, chupador;
+        
+            IF cuadroV1 OR cuadroV2 OR cuadroV3 OR cuadroV4 = FALSE THEN
+                dejarSalchichaVertical;
+            ENDIF
+            
+            IF cuadroV5 OR cuadroV6 OR cuadroV7 OR cuadroV8 = FALSE THEN
+                dejarSalchichaVertical2;
+            ENDIF
+            
+            IF cuadroV8 = TRUE THEN
+                MoveJ home ,v500,z50,chupador;
+                TPErase;
+                EXIT;
+            ENDIF
+    ENDIF
+    
+    TPWrite "Conteo de salchichas: "\ Num := countSalchicha;
+    MoveJ Offs(agarrar, 0, 0, 150), v500, fine, chupador;
+    !MoveJ acercarAgarrar, v500, z50, chupador;
+    MoveL agarrar, v500, z50, chupador;
+    WaitRob \ZeroSpeed;
+    !Encender chupador
+    STOP;
+    WaitTime 0.5;
+    IF cuadro1 = FALSE THEN
+        dejarSalchicha1;
+    ELSEIF cuadro2 =FALSE THEN
+        dejarSalchicha2;
+    ELSEIF cuadro3=FALSE THEN
+        dejarSalchicha3;
+    ELSEIF cuadro4=FALSE THEN
+        dejarSalchicha4;
+    ENDIF
+ENDPROC
+
+
+!Deja 5 salchichas del primer cuadro acostado
+PROC dejarSalchicha1()
+    MoveJ Offs(pruebaDejr, 0, 0, 150), v500, fine, chupador;          
+    MoveL pruebaDejr, v500, z50, chupador;
+    WaitRob \ZeroSpeed;
+    STOP;
+    MoveL Offs(pruebaDejr, 0, 0, 150), v500, fine, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = 2 THEN
+        cuadro1:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarSalchicha2()
+    MoveJ Offs(pruebaDejr, 178, 0, 150), v500, fine, chupador;
+    MoveL Offs(pruebaDejr, 178, 0, 0), v500, fine, chupador;
+    WaitRob \ZeroSpeed;
+    STOP;
+    MoveL Offs(pruebaDejr, 178, 0, 150), v500, fine, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = 2 THEN
+        cuadro2:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarSalchicha3()
+    MoveJ Offs(pruebaDejr, 0, 178, 150), v500, fine, chupador;
+    MoveJ Offs(pruebaDejr, 0, 178, 0), v500, fine, chupador;
+     WaitRob \ZeroSpeed;
+     STOP;
+     MoveL Offs(pruebaDejr, 0, 178, 150), v500, fine, chupador;
+     Incr countSalchicha;
+     IF countSalchicha = 2 THEN
+         cuadro3:=TRUE;
+         countSalchicha:=0;
+     ENDIF
+     tomarSalchicha;
+ENDPROC
+
+PROC dejarSalchicha4()
+    MoveJ Offs(pruebaDejr, 178, 178, 150), v500, fine, chupador;
+    MoveJ Offs(pruebaDejr, 178, 178, 0), v500, fine, chupador;
+     WaitRob \ZeroSpeed;
+     STOP;
+     MoveL Offs(pruebaDejr, 178, 178, 200), v500, fine, chupador;
+     Incr countSalchicha;
+     IF countSalchicha = 2 THEN
+         cuadro4:=TRUE;
+         countSalchicha:=0;
+     ENDIF
+     tomarSalchicha;
+ENDPROC
+
+PROC dejarSalchichaVertical()
+   IF cuadroV1 = FALSE THEN
+        MoveJ Offs(preVertical1, 0, 0, 200), v500, fine, chupador;
+        MoveL preVertical1, v500, z50, chupador;
+        WaitRob \ZeroSpeed;
+        WaitTime 1.5;
+        MoveL postVertical1, v500, z50, chupador;
+        WaitRob \ZeroSpeed;
+        STOP;
+        !Soltar salchicha
+        MoveL Offs(postVertical1, 0, 0, 200), v500, fine, chupador;
+        cuadroV1 := TRUE;
+        tomarSalchicha;
+            ELSEIF cuadroV1 = TRUE AND cuadroV2 = FALSE THEN    !Dejar cuadro 2 vertical
+                MoveJ Offs(preVertical1, -65, 0, 200), v500, fine, chupador;
+                MoveL Offs(preVertical1, -65, 0, 0), v500, z50, chupador;
+                WaitRob \ZeroSpeed;
+                WaitTime 1.5;
+                MoveL Offs(postVertical1, -65, 0, 0), v500, fine, chupador;
+                WaitRob \ZeroSpeed;
+                STOP;
+                !Soltar salchicha
+                MoveL Offs(postVertical1, -65, 0, 200), v500, fine, chupador;
+                cuadroV2 := TRUE;
+                tomarSalchicha;
+                    ELSEIF cuadroV1 AND cuadroV2 = TRUE AND cuadroV3 = FALSE THEN  !Dejar cuadro 3 vertical 
+                        MoveJ Offs(preVertical1, 0, 120, 200), v500, fine, chupador;
+                        MoveL Offs(preVertical1, 0, 120, 0), v500, fine, chupador;
+                        WaitRob \ZeroSpeed;
+                        WaitTime 1.5;
+                        MoveL Offs(postVertical1, 0, 120, 0), v500, fine, chupador;
+                        WaitRob \ZeroSpeed;
+                        STOP;
+                        !Soltar salchicha
+                        MoveL Offs(postVertical1, 0, 120, 200), v500, fine, chupador;
+                        cuadroV3 := TRUE;
+                        tomarSalchicha;
+                            ELSEIF cuadroV1 AND cuadroV2 AND cuadroV3 = TRUE AND cuadrov4 = FALSE THEN !Dejar cuadro 4 vertical
+                                MoveJ Offs(preVertical1, -65, 120, 200), v500, fine, chupador;
+                                MoveL Offs(preVertical1, -65, 120, 0), v500, fine, chupador;
+                                WaitRob \ZeroSpeed;
+                                WaitTime 1.5;
+                                MoveL Offs(postVertical1, -65, 120, 0), v500, fine, chupador;
+                                WaitRob \ZeroSpeed;
+                                STOP;
+                                !Soltar salchicha
+                                MoveL Offs(postVertical1, -165, 120, 200), v500, fine, chupador;
+                                cuadroV4 := TRUE;
+                                tomarSalchicha;
+    ENDIF
+ENDPROC
+
+PROC dejarSalchichaVertical2()
+   IF cuadroV5 = FALSE THEN
+        MoveJ Offs(preVertical2, 0, 0, 200), v500, fine, chupador;
+        MoveL preVertical2, v500, z50, chupador;
+        WaitRob \ZeroSpeed;
+        WaitTime 1;
+        MoveL postVertical2, v500, z50, chupador;
+        WaitRob \ZeroSpeed;
+        STOP;
+        !Soltar salchicha
+        MoveL Offs(postVertical2, 0, 0, 200), v500, fine, chupador;
+        cuadroV5 := TRUE;
+        tomarSalchicha;
+            ELSEIF cuadroV5 = TRUE AND cuadroV6 = FALSE THEN
+                MoveJ Offs(preVertical2, 120, 120, 200), v500, fine, chupador;
+                MoveL Offs(preVertical2, 120, 120, 0), v500, fine, chupador;
+                WaitRob \ZeroSpeed;
+                WaitTime 1;
+                MoveL Offs(postVertical2, 120, 120, 0), v500, fine, chupador;
+                WaitRob \ZeroSpeed;
+                STOP;
+                !Soltar salchicha
+                MoveL Offs(postVertical2, 120, 120, 200), v500, fine, chupador;
+                cuadroV6 := TRUE;
+                tomarSalchicha;
+                    ELSEIF cuadroV5 AND cuadroV6 = TRUE AND cuadroV7 = FALSE THEN
+                        MoveJ Offs(preVertical2, 240, 120, 200), v500, fine, chupador;
+                        MoveL Offs(preVertical2, 240, 120, 0), v500, fine, chupador;
+                        WaitRob \ZeroSpeed;
+                        WaitTime 1;
+                        MoveL Offs(postVertical2, 240, 120, 0), v500, fine, chupador;
+                        WaitRob \ZeroSpeed;
+                        STOP;
+                        !Soltar salchicha
+                        MoveL Offs(postVertical2, 240, 120, 200), v500, fine, chupador;
+                        cuadroV7 := TRUE;
+                        tomarSalchicha;
+                            ELSEIF cuadroV5 AND cuadroV6 AND cuadroV7 = TRUE AND cuadroV8 = FALSE THEN
+                                MoveL Offs(preVertical2, 360, 120, 200), v500, fine, chupador;
+                                MoveL Offs(preVertical2, 360, 120, 0), v500, fine, chupador;
+                                WaitRob \ZeroSpeed;
+                                WaitTime 1;
+                                MoveL Offs(postVertical2, 360, 120, 0), v500, fine, chupador;
+                                WaitRob \ZeroSpeed;
+                                STOP;
+                                !Soltar salchicha
+                                MoveL Offs(postVertical2, 360, 120, 200), v500, fine, chupador;
+                                cuadroV8 := TRUE;
+                                tomarSalchicha;
+    ENDIF
+ENDPROC
+
+ENDMODULE
