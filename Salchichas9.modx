@@ -1,0 +1,491 @@
+MODULE MainModule
+	PERS tooldata chupador := [TRUE,[[0,0,11],[1,0,0,0]],[0.7,[-21.3,-14.8,51.3],[1,0,0,0],0.011,0.011,0.001]];
+	CONST robtarget acercarAgarrar := [[746.08,-220.24,261.16],[0.0075049,0.912605,0.408769,0.00166498],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget agarrar := [[756.51,-220.19,258.28],[0.0074907,0.912616,0.408746,0.00166653],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget soltar := [[871.01,192.78,235.79],[0.00327119,0.367427,0.930046,0.00109883],[0,-1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget home := [[756.02,12.22,901.96],[0.0140844,0.918175,0.395895,0.00484775],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+	CONST robtarget pruebaDejr := [[741.20,46.28,248.82],[0.00382986,0.917699,0.39717,0.00838134],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+    CONST robtarget preVertical1 := [[703.02,-47.33,222.29],[0.259021,-0.656642,0.251231,-0.662278],[-1,-1,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget postVertical1 := [[705.60,-23.57,221.73],[0.253228,-0.656929,0.267313,-0.657924],[-1,-1,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget agarrarVertical := [[741.72,-220.19,255.04],[0.00750606,0.912618,0.408742,0.00169277],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    CONST robtarget preCentro := [[756.38,142.48,586.04],[0.123692,-0.741672,0.239175,-0.614344],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget preVertical2 := [[743.93,178.76,221.90],[0.645092,-0.647062,-0.301984,-0.27198],[0,1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget postVertical2 := [[739.64,184.25,214.58],[0.645091,-0.647118,-0.301955,-0.271883],[0,1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    CONST robtarget pruebaOffAgarreVertical := [[741.73,-220.18,403.92],[0.00752064,0.912625,0.408726,0.00170749],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget pruebaOffPre := [[641.31,202.02,361.19],[0.2597,-0.656782,0.27021,-0.654355],[0,0,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+    PERS wobjdata wobj_cajaFormador := [FALSE,TRUE,"",[[686.187,88.3068,374.52],[1.63438E-05,0.729606,0.683867,2.77281E-06]],[[0,0,0],[1,0,0,0]]];
+    CONST robtarget pre8 := [[1016.75,118.85,184.62],[0.260657,-0.273224,-0.650339,-0.65914],[0,1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+
+    CONST robtarget centro := [[888.21,-47.05,439.14],[0.321261,0.600472,0.685623,0.257187],[-1,-1,0,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget post8 := [[1016.76,101.82,184.61],[0.260644,-0.273242,-0.650325,-0.659151],[0,1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+    !Variables para seguimiento de proceso
+    VAR NUM countSalchicha := 0; !LLeva conteo de salchichas
+    VAR NUM limSalchicha := 3;   !Cambiar a cuantos paquetes de salchicha quieres que deje en los cuadros 1, 2, 3 y 4.
+    
+    !Indicadores de cuadros terminados
+    VAR bool cuadro{6} := [FALSE, FALSE, FALSE, FALSE, FALSE, FALSE]; 
+    VAR bool cuadroV{8} := [FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE];
+    
+    !Configuraciones de velocidad y z de los movimientos.
+    VAR speeddata VSS:=[1500, 500, 5000, 1000];   ! Velocidad sin salchicha
+    VAR speeddata VCS:=[1000, 500, 5000, 1000];   ! Velocidad con salchicha
+    VAR zonedata zSin :=z60; !Z SIN salchicha
+    VAR zonedata zCon :=z50;
+    CONST robtarget agarrarAsarHorizontal := [[738.00,-246.62,265.02],[0.00766925,0.912894,0.408121,0.00171927],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget dejarAsarHorizontal := [[741.78,31.37,200.38],[0.007703,0.912811,0.408305,0.00174984],[0,-1,2,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget dejarAsarVertical := [[736.04,237.87,200.46],[0.637796,-0.6569,-0.27701,-0.291486],[0,1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget agarrarAsarVertical := [[737.97,-221.46,269.81],[0.00760298,0.912885,0.408142,0.00165042],[-1,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget medio := [[851.97,-24.92,800.62],[0.0617045,-0.908822,0.367118,-0.188305],[-1,-1,2,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget medio2 := [[891.16,-24.93,829.98],[0.146256,-0.838199,0.335833,-0.40404],[-1,-1,2,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget medio3 := [[735.77,-25.08,878],[0.220829,-0.711478,0.283677,-0.603789],[-1,-1,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget asarVertical := [[731.88,204.79,185.22],[0.744047,-0.532638,-0.239799,-0.324326],[0,1,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget dejar4 := [[914.72,228.85,261.83],[0.00380974,0.917714,0.397135,0.00835563],[0,-1,1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    CONST robtarget dentro := [[683.02,-44.26,222.28],[0.258992,-0.656657,0.251227,-0.662277],[-1,-1,2,1],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]; !Z CON salchicha
+    
+PROC Main()
+    MoveJ home , VSS, zSin, chupador; !Mover a home antes de iniciar proceso.
+    AccSet 100, 70; !Ajustes de aceleracion
+    !tomarSalchicha; !Llama a PROC que toma el paquete de salchicha
+    pregunta;
+ENDPROC
+
+!PROC que toma los paquetes de salchicha dependiendo cuadros de formador terminados. 
+PROC tomarSalchicha()
+    TPWrite "Conteo de salchichas: "\ Num := countSalchicha; != Linea 56
+    MoveJ Offs(acercarAgarrar, 0, 0, 150), VSS, zSin, chupador;
+    !MoveJ acercarAgarrar, v500, z50, chupador;
+    MoveL acercarAgarrar, VSS, zSin, chupador;
+    WaitRob \ZeroSpeed;
+    !Encender chupador
+    Set ABB_Scalable_IO_0_DO1;
+    STOP;
+    WaitTime 0.5;
+    
+    TEST cuadro{1} = FALSE OR TRUE
+        CASE cuadroV{8} = FALSE: dejarCuadroV8;
+        CASE cuadroV{7} = FALSE: dejarCuadroV7;
+        CASE cuadroV{6} = FALSE: dejarCuadroV6;
+        CASE cuadroV{5} = FALSE: dejarCuadroV5;
+        CASE cuadroV{4} = FALSE: dejarCuadroV4;
+        CASE cuadroV{3} = FALSE: dejarCuadroV3;
+        CASE cuadroV{2} = FALSE: dejarCuadroV2;
+        CASE cuadroV{1} = FALSE: dejarCuadroV1;
+        CASE cuadro{1} = FALSE: dejarSalchicha1;
+        CASE cuadro{2} = FALSE: dejarSalchicha2;
+        CASE cuadro{3} = FALSE: dejarSalchicha3;
+        CASE cuadro{4} = FALSE: dejarSalchicha4;
+    ENDTEST
+ENDPROC
+
+!Deja n salchichas del primer cuadro acostado (cuadro1). Capacidad del cuadro1 = 5
+PROC dejarSalchicha1()
+    MoveJ Offs(pruebaDejr, 0, 0, 150), VCS, zCon, chupador; !Se posiciona 150mm arriba del cuadro 1.       
+    MoveL Offs(pruebaDejr, 0, 0, 0), VCS, zCon, chupador;   !Se posiciona en el cuadro 1 en donde dejara el paquete de salchichas.
+    WaitRob \ZeroSpeed;                                     !Espera a que el robot este detenido.
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;                                                   !Pausa el programa para encender manualmente ventosas de gripper.
+    MoveL Offs(pruebaDejr, 0, 0, 150), VCS, zCon, chupador; !Se posiciona 150mm arriba del cuadro 1.
+    Incr countSalchicha;                                    !Se incrementa el conteo de paquete de salchichas cada vez que pasa por este punto.
+    IF countSalchicha = limSalchicha THEN                   !Si el conteo es igual al limite puesto al principio en limSalchicha, cuadro1 se vuelve verdadero y se reinicia el contador de paquetes de salchichas.
+        cuadro{1}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchicha;                                           !Se llama a rutina de tomar salchicha
+ENDPROC
+
+!Deja n salchichas en el segundo cuadro acostado (cuadro2). Capacidad del cuadro2 = 5
+!Mismos movimientos y logica que dejarSalchicha1 pero posicionados en el siguiente cuadro.
+PROC dejarSalchicha2()
+    MoveJ Offs(pruebaDejr, 171.66, 3.32, 150), VCS, zCon, chupador;
+    MoveL Offs(pruebaDejr, 171.66, 3.32, -24.32), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(pruebaDejr, 171.66, 3.32, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{2}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchicha;
+ENDPROC
+
+!Deja n salchichas en el tercer cuadro acostado (cuadro3). Capacidad del cuadro3 = 5
+!Mismos movimientos y logica que dejarSalchicha1 pero posicionados en el siguiente cuadro.
+PROC dejarSalchicha3()
+    MoveJ Offs(pruebaDejr, -5.79, 186, 150), VCS, zCon, chupador;
+    MoveJ Offs(pruebaDejr, -5.79, 186, 5.13), VCS, zCon, chupador;
+     WaitRob \ZeroSpeed;
+     Reset ABB_Scalable_IO_0_DO1;
+     STOP;
+     MoveL Offs(pruebaDejr, -5.79, 187, 150), VSS, zSin, chupador;
+     Incr countSalchicha;
+     IF countSalchicha = limSalchicha THEN
+         cuadro{3}:=TRUE;
+         countSalchicha:=0;
+     ENDIF
+     tomarSalchicha;
+ENDPROC
+
+!Deja n salchichas en el cuarto cuadro acostado (cuadro4). Capacidad del cuadro4 = 5
+!Mismos movimientos y logica que dejarSalchicha1 pero posicionados en el siguiente cuadro.
+PROC dejarSalchicha4()
+    !MoveJ Offs(pruebaDejr, 168.95, 182.55, 150), VCS, zCon, chupador;
+    MoveJ Offs(dejar4, 0, 0, 150), VCS, zCon, chupador;
+    !MoveJ Offs(pruebaDejr, 168.95, 182.55, -15.88), VCS, zCon, chupador;
+    MoveJ Offs(dejar4, 0, 0, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !MoveL Offs(pruebaDejr, 168.95, 182.55, 150), VSS, zSin, chupador;
+    MoveJ Offs(dejar4, 0, 0, 150), VCS, zCon, chupador;
+    Incr countSalchicha;
+     IF countSalchicha = limSalchicha THEN
+         cuadro{4}:=TRUE;
+         countSalchicha:=0;
+         reinicio;
+     ENDIF
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV1()
+    !MoveJ Offs(medio, 0, 0, -300), VCS, zCon, chupador; !MoveJ Offs(medio2, 0, 0, -300), VCS, zCon, chupador; !MoveJ Offs(medio3, 0, 0, -300), VCS, zCon, chupador;
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical1, 0, 0, 150), VCS, zCon, chupador;
+    MoveL preVertical1, VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical1, -20, 0, 0), VCS, zCon, chupador;
+    MoveL dentro, VCS, zSin, chupador;
+    !MoveL postVertical1, VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical1, -20, 0, 200), VSS, zSin, chupador;
+    cuadroV{1} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV2()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical1, 0, 120.18, 200), VCS, zCon, chupador;
+    MoveL Offs(preVertical1, 0, 120.18, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical1, -20, 120.18, 0), VCS, zCon, chupador;
+    !MoveL postVertical1, VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical1, -20, 120.18, 200), VSS, zSin, chupador;
+    cuadroV{2} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV3()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical1, 0, 242.18, 200), VCS, zCon, chupador;
+    MoveL Offs(preVertical1, 0, 242.18, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical1, -20, 242.18, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical1, -20, 242.18, 200), VSS, zSin, chupador;
+    cuadroV{3} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV8()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical1, 122, 368, 200), VCS, zCon, chupador;
+    MoveL Offs(preVertical1, 122, 368, -10), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical1, 83, 368, -10), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical1, 83, 368, 200), VSS, zSin, chupador;
+    cuadroV{8} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV4()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(postVertical2, 0, 0, 200), VCS, zCon, chupador;
+    MoveL postVertical2, VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(postVertical2, 0, -23, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(postVertical2, 0, -23, 200), VSS, zSin, chupador;
+    cuadroV{4} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV5()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(postVertical2, 0, 65, 200), VCS, zCon, chupador;
+    MoveL Offs(postVertical2, 0, 65, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(postVertical2, 0, 45, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(postVertical2, 0, 45, 200), VSS, zSin, chupador;
+    cuadroV{5} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV6()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical2, 113.99, 0, 200), VCS, zCon, chupador;
+    MoveL Offs(preVertical2, 113.99, 0, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical2, 113.99, -16.23, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical2, 113.99, -16.23, 200), VSS, zSin, chupador;
+    cuadroV{6} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+PROC dejarCuadroV7()
+    MoveL Offs(agarrarVertical, 0, 0, 250), VSS, zSin, chupador;
+    MoveJ Offs(preVertical2, 113.99, 70, 200), VCS, zCon, chupador;
+    MoveL Offs(preVertical2, 113.99, 70, -14.88), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    WaitTime 0.5;
+    MoveL Offs(preVertical2, 113.99, 47, -14.88), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    !Soltar salchicha
+    MoveL Offs(preVertical2, 113.99, 47, 200), VSS, zSin, chupador;
+    cuadroV{7} := TRUE;
+    tomarSalchicha;
+ENDPROC
+
+!--------------------------------------------------------------PALETIZADO DE SALCHICHAS DE ASAR-----------------------------------------------------------------------------------------------------
+
+! PROC que toma las salchichas de asar.    Dimensiones: 14.7 x 14.7
+PROC tomarSalchichaAsar()
+    MoveJ Offs(agarrarAsarHorizontal, 0, 0, 150), VSS, zSin, chupador;  !Se posiciona arriba del paquete de salchichas. +200 en Z.      
+    MoveL agarrarAsarHorizontal, VSS, zSin, chupador;                   !Se posiciona en el lugar exacto a agarrar paquete de salchichas.
+    WaitRob \ZeroSpeed;                                                 !Espera a que el robot este totalmente detenido.
+    !Encender chupador
+    Set ABB_Scalable_IO_0_DO1;                                          !Se encienden las ventosas.
+    STOP;                                                               !Se para el programa.
+    WaitTime 0.5;                                                       !Espera 0.5 segundos.
+    MoveJ Offs(agarrarAsarHorizontal, 0, 0, 150), VSS, zSin, chupador;  !Sube de nuevo 200mm en Z. Evita colision con el transformador en el movimiento a dejar.
+    
+    TEST cuadro{1} = FALSE OR TRUE
+        CASE cuadro{1} = FALSE: dejarAsar1; 
+        CASE cuadro{2} = FALSE: dejarAsar2;
+        CASE cuadro{3} = FALSE: dejarAsar3;
+        CASE cuadro{4} = FALSE: dejarAsar4;
+        CASE cuadro{5} = FALSE: dejarAsar5;
+        CASE cuadro{6} = FALSE: dejarAsar6;
+        CASE cuadroV{1} = FALSE: dejarAsarVertical1;
+        CASE cuadroV{2} = FALSE: dejarAsarVertical2;
+    ENDTEST
+ENDPROC
+
+!PROC para dejar el cuadro 1 horizontal | Capacidad del cuadro 4 paquetes de salchichas.
+PROC dejarAsar1()
+    MoveJ Offs(dejarAsarHorizontal, 0, 0, 150), VCS, zCon, chupador;   !Se posiciona 150mm arriba de la posicion a dejar el cuadro 1.
+    MoveL dejarAsarHorizontal, VCS, zCon, chupador;                    !Se posiciona en la posicion a dejar el cuadro 1.
+    WaitRob \ZeroSpeed;                                                !Espera que el robot este totalmente detenido.
+    Reset ABB_Scalable_IO_0_DO1;                                       !Se apagan ventosas.
+    STOP;                                                              !Se pausa el programa.
+    MoveJ Offs(dejarAsarHorizontal, 0, 0, 150), VSS, zSin, chupador;   !Se posiciona 150mm arriba de la posicion a dejar el cuadro 1 para evitar colision en el movimiento a agarrar otro paquete.
+    Incr countSalchicha;                                               !Se incrementa el conteo de salchichas.
+    IF countSalchicha = limSalchicha THEN                              !Si el conteo de salchichas llego al limite del cuadro, se marca como cuadro finalizado en la siguiente linea
+        cuadro{1}:= TRUE;
+        countSalchicha:=0;                                             !Se reinicia el conteo de salchichas a 0.
+    ENDIF
+    tomarSalchichaAsar;                                                !Llama a tomarSalchichaAsar.
+ENDPROC
+
+!PROC para dejar el cuadro 2 horizontal. Se sigue la misma logica que el PROC para llenar el cuadro 1 | Capacidad del cuadro 4 paquetes de salchichas.
+!El unico cambio es en las coordenadas, se usan Offsets para el movimiento en los demas cuadros, tomando en cuenta el movimiento en 150 mm para X | 140 mm en Y 
+PROC dejarAsar2()
+    MoveJ Offs(dejarAsarHorizontal, 150, 0, 150), VCS, zCon, chupador;  
+    MoveL Offs(dejarAsarHorizontal, 150, 0, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(dejarAsarHorizontal, 150, 0, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{2}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el cuadro 3 horizontal. Se sigue la misma logica que el PROC para llenar el cuadro 1 | Capacidad del cuadro 4 paquetes de salchichas.
+!El unico cambio es en las coordenadas, se usan Offsets para el movimiento en los demas cuadros, tomando en cuenta el movimiento en 150 mm para X | 140 mm en Y
+PROC dejarAsar3()
+    MoveJ Offs(dejarAsarHorizontal, 0, 140, 150), VCS, zCon, chupador;
+    MoveL Offs(dejarAsarHorizontal, 0, 140, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(dejarAsarHorizontal, 0, 140, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{3}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el cuadro 4 horizontal. Se sigue la misma logica que el PROC para llenar el cuadro 1 | Capacidad del cuadro 4 paquetes de salchichas.
+!El unico cambio es en las coordenadas, se usan Offsets para el movimiento en los demas cuadros, tomando en cuenta el movimiento en 150 mm para X | 140 mm en Y
+PROC dejarAsar4()
+    MoveJ Offs(dejarAsarHorizontal, 150, 140, 150), VCS, zCon, chupador;
+    MoveL Offs(dejarAsarHorizontal, 150, 140, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(dejarAsarHorizontal, 150, 140, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{4}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el cuadro 5 horizontal. Se sigue la misma logica que el PROC para llenar el cuadro 1 | Capacidad del cuadro 4 paquetes de salchichas.
+!El unico cambio es en las coordenadas, se usan Offsets para el movimiento en los demas cuadros, tomando en cuenta el movimiento en 150 mm para X | 140 mm en Y
+PROC dejarAsar5()
+    MoveJ Offs(dejarAsarHorizontal, 0, 280, 150), VCS, zCon, chupador;
+    MoveL Offs(dejarAsarHorizontal, 0, 280, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(dejarAsarHorizontal, 0, 280, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{5}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el cuadro 6 horizontal. Se sigue la misma logica que el PROC para llenar el cuadro 1. | Capacidad del cuadro 4 paquetes de salchichas.
+!El unico cambio es en las coordenadas, se usan Offsets para el movimiento en los demas cuadros, tomando en cuenta el movimiento en 150 mm para X | 140 mm en Y
+PROC dejarAsar6()
+    MoveJ Offs(dejarAsarHorizontal, 150, 280, 150), VCS, zCon, chupador;
+    MoveL Offs(dejarAsarHorizontal, 150, 280, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(dejarAsarHorizontal, 150, 280, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadro{6}:= TRUE;
+        countSalchicha:=0;
+        
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el primer paquete de salchicha vertical. | Capacidad del cuadro: 1 paquete de salchichas
+!Se utiliza un robtarget diferente. "dejarAsarVertical" en lugar de "dejarAsarHorizontal".
+PROC dejarAsarVertical1()
+    MoveJ Offs(asarVertical, 0, 0, 150), VCS, zCon, chupador;
+    MoveL asarVertical, VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(asarVertical, 0, 0, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadroV{1}:= TRUE;
+        countSalchicha:=0;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!PROC para dejar el segundo paquete de salchicha vertical. | Capacidad del cuadro: 1 paquete de salchichas
+!Se utilizan offsets.  150mm para X. 
+PROC dejarAsarVertical2()
+    MoveJ Offs(asarVertical, 150, 0, 150), VCS, zCon, chupador;
+    MoveL Offs(asarVertical, 150, 0, 0), VCS, zCon, chupador;
+    WaitRob \ZeroSpeed;
+    Reset ABB_Scalable_IO_0_DO1;
+    STOP;
+    MoveL Offs(asarVertical, 150, 0, 150), VSS, zSin, chupador;
+    Incr countSalchicha;
+    IF countSalchicha = limSalchicha THEN
+        cuadroV{2}:= TRUE;
+        countSalchicha:=0;
+        reinicio;
+    ENDIF
+    tomarSalchichaAsar;
+ENDPROC
+
+!Para finalizar programa, se va a home, se borra el texto de tp y se termina programa.
+PROC finalizar()
+    MoveJ home , VSS, zSin, chupador;
+    WaitRob\inpos;
+    TPErase;
+    EXIT;
+ENDPROC
+
+!PROC para preguntar a usuario el tipo de paquete de salchichas que quiere paletizar.
+PROC pregunta()
+    TPReadFK reg1, "Selecciona el tipo de salchicha que quieres paletizar", stEmpty, stEmpty, stEmpty, "SALCHICHAS JUMBO", "SALCHICHAS ASAR";
+    IF reg1 = 4 THEN              !Si reg1 = 4 (SALCHICHAS JUMBO), se corre tomarSalchicha que corresponde al agarre de salchichas JUMBO
+        cuadro{1} := FALSE; cuadro{2} := FALSE; cuadro{3} := FALSE; cuadro{4} := FALSE; cuadro{5} := FALSE; cuadro{6} := FALSE;
+        cuadroV{1} := FALSE; cuadroV{2} := FALSE; cuadroV{3} := FALSE; cuadroV{4} := FALSE; cuadroV{5} := FALSE; cuadroV{6} := FALSE; cuadroV{7} := FALSE; cuadroV{8} := FALSE;    
+        tomarSalchicha;
+    ELSEIF reg1 = 5 THEN          !Si reg1 = 5 (SALCHICHAS ASAR), se corre tomarSalchichaAsar que corresponde al agarre de salchichas para asar.
+        cuadro{1} := FALSE; cuadro{2} := FALSE; cuadro{3} := FALSE; cuadro{4} := FALSE; cuadro{5} := FALSE; cuadro{6} := FALSE;
+        cuadroV{1} := FALSE; cuadroV{2} := FALSE; cuadroV{3} := FALSE; cuadroV{4} := FALSE; cuadroV{5} := FALSE; cuadroV{6} := FALSE; cuadroV{7} := FALSE; cuadroV{8} := FALSE;    
+        tomarSalchichaAsar;
+    ENDIF
+ENDPROC
+
+!PROC para preguntar a usuario si quiere reiniciar/finalizar el paletizado.
+PROC reinicio()
+    !Los valores de los cuadros (estados) se convierten en FALSE nuevamente.
+    cuadro{1} := FALSE; cuadro{2} := FALSE; cuadro{3} := FALSE; cuadro{4} := FALSE; cuadro{5} := FALSE; cuadro{6} := FALSE;
+    cuadroV{1} := FALSE; cuadroV{2} := FALSE; cuadroV{3} := FALSE; cuadroV{4} := FALSE; cuadroV{5} := FALSE; cuadroV{6} := FALSE; cuadroV{7} := FALSE; cuadroV{8} := FALSE;
+    countSalchicha:=0;
+    
+    MoveJ home , VSS, zSin, chupador;
+    WaitRob\inpos;
+    !Pregunta sobre el reinicio
+    TPReadFK reg1, "¿Quieres reiniciar el paletizado?", stEmpty, stEmpty, stEmpty, "REINICIAR", "FINALIZAR";
+    IF reg1 = 4 THEN !Si el usuario quiere reinicio mandar a main nuevamente.
+        main;
+    ELSEIF reg1 = 5 THEN !Si el usuario quiere finalizar el paletizado llamar a PROC finalizar.
+    finalizar;
+    ENDIF
+ENDPROC
+
+ENDMODULE
